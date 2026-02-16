@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 import random
 import math
+import os
 
 
 height = 1024
@@ -95,20 +96,23 @@ def anti_alias_color(i, j, cells):
 	return mix_cells(close_cells, i, j)
 
 
-cells = list(VoronoiCell(height, width) for i in range(num_cells))
 
-pixel_array = np.ones((height,width, 3), dtype=np.uint8)
-pixel_array2 = np.ones((height,width, 3), dtype=np.uint8)
 
-for i in range(height):
-	for j in range(width):
-		pixel_array[i][j] = closest_point_color(i, j, cells)
 
-for i in range(height):
-	for j in range(width):
-		pixel_array2[i][j] = anti_alias_color(i, j, cells)
+def main():
+	cells = list(VoronoiCell(height, width) for i in range(num_cells))
 
-image = Image.fromarray(pixel_array)
-image.save('normal.png')
-image = Image.fromarray(pixel_array2)
-image.save('anti_alias.png')
+	pixel_array = np.ones((height,width, 3), dtype=np.uint8)
+
+	for i in range(height):
+		for j in range(width):
+			pixel_array[i][j] = anti_alias_color(i, j, cells)
+
+	image_path = "images/"
+	os.makedirs(image_path, exist_ok=True)
+
+	image = Image.fromarray(pixel_array)
+	image.save(os.path.join(image_path, 'anti_alias.png'))
+
+if __name__ == "__main__":
+	main()
